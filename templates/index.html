@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Mini Loja</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+</head>
+
+<body>
+
+    <header class="cabecalho">
+        <div class="largura">
+            <a class="marca" href="{{ url_for('inicio') }}">
+                MINI<span>LOJA</span>
+            </a>
+
+            <h1>Encontre seus produtos favoritos</h1>
+            <p class="subtitulo">
+                Uma loja simples, prática e feita para você.
+            </p>
+        </div>
+    </header>
+
+    <main class="largura conteudo">
+
+        <section class="secao-produtos">
+            <div class="titulo-secao">
+                <div>
+                    <p class="sobretitulo">NOSSO CATÁLOGO</p>
+                    <h2>Nossos produtos</h2>
+                </div>
+
+                <span>{{ produtos|length }} produto(s)</span>
+            </div>
+
+            <div class="lista-produtos">
+
+                {% for produto in produtos %}
+                <article class="produto">
+
+                    <div class="icone-produto" aria-hidden="true">
+                        {% if "notebook" in produto.nome|lower %}
+                        💻
+                        {% elif "mouse" in produto.nome|lower %}
+                        🖱️
+                        {% elif "teclado" in produto.nome|lower %}
+                        ⌨️
+                        {% else %}
+                        📦
+                        {% endif %}
+                    </div>
+
+                    <p class="id-produto">PRODUTO #{{ produto.id }}</p>
+
+                    <h3>{{ produto.nome }}</h3>
+
+                    <p class="preco">
+                        R$ {{ "%.2f"|format(produto.preco)|replace(".", ",") }}
+                    </p>
+
+                    <p class="estoque">
+                        {% if produto.estoque > 0 %}
+                        {{ produto.estoque }} unidade(s) em estoque
+                        {% else %}
+                        Produto esgotado
+                        {% endif %}
+                    </p>
+
+                    <div class="acoes-produto">
+                        <button class="botao botao-principal adicionar" type="button" data-id="{{ produto.id }}"
+                            data-nome="{{ produto.nome }}" data-preco="{{ produto.preco }}"
+                            data-estoque="{{ produto.estoque }}" {% if produto.estoque <=0 %}disabled{% endif %}>
+                            Adicionar ao carrinho
+                        </button>
+
+                        <a class="botao botao-secundario" href="{{ url_for('comprar', produto_id=produto.id) }}">
+                            Ver produto
+                        </a>
+                    </div>
+
+                </article>
+                {% else %}
+                <p class="aviso-vazio">
+                    Nenhum produto cadastrado no momento.
+                </p>
+                {% endfor %}
+
+            </div>
+        </section>
+
+        <section class="secao-carrinho">
+
+            <div class="titulo-secao">
+                <div>
+                    <p class="sobretitulo">SEU PEDIDO</p>
+                    <h2>Seu carrinho</h2>
+                </div>
+
+                <span>
+                    <span id="quantidadeCarrinho">0</span> unidade(s)
+                </span>
+            </div>
+
+            <div id="carrinhoItens" class="itens-carrinho" aria-live="polite">
+                <p class="carrinho-vazio">
+                    Seu carrinho está vazio.
+                </p>
+            </div>
+
+            <div class="resumo-carrinho">
+                <div class="linha-resumo">
+                    <span>Quantidade de unidades</span>
+                    <strong id="Carrinho">0</strong>
+                </div>
+
+                <div class="linha-resumo total">
+                    <span>Total</span>
+                    <strong id="total">R$ 0,00</strong>
+                </div>
+            </div>
+
+            <div class="acoes-carrinho">
+                <button id="limpar" class="botao botao-secundario" type="button">
+                    Limpar carrinho
+                </button>
+
+                <button id="finalizar" class="botao botao-principal" type="button">
+                    Finalizar pedido
+                </button>
+            </div>
+
+            <p id="mensagemCarrinho" class="mensagem" role="status"></p>
+
+            <p class="nota-carrinho">
+                Demonstração de loja: o pedido não é enviado nem pago online.
+            </p>
+
+        </section>
+
+    </main>
+
+    <footer class="rodape">
+        <p>Mini Loja · Projeto de estudo com Flask e SQLite</p>
+    </footer>
+
+</body>
+
+</html>

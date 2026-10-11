@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ produto.nome }} | Mini Loja</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <header class="cabecalho cabecalho-menor">
+        <div class="largura">
+            <a class="marca" href="{{ url_for('inicio') }}">
+                MINI<span>LOJA</span>
+            </a>
+
+            <p class="subtitulo">Detalhes do produto</p>
+        </div>
+    </header>
+
+    <main class="largura pagina-produto">
+
+        <a class="voltar" href="{{ url_for('inicio') }}">
+            ← Voltar para a loja
+        </a>
+
+        <article class="detalhe-produto">
+
+            <div class="icone-produto icone-grande" aria-hidden="true">
+                {% if "notebook" in produto.nome|lower %}
+                💻
+                {% elif "mouse" in produto.nome|lower %}
+                🖱️
+                {% elif "teclado" in produto.nome|lower %}
+                ⌨️
+                {% else %}
+                📦
+                {% endif %}
+            </div>
+
+            <div>
+                <p class="sobretitulo">PRODUTO #{{ produto.id }}</p>
+
+                <h1>{{ produto.nome }}</h1>
+
+                <p class="preco preco-grande">
+                    R$ {{ "%.2f"|format(produto.preco)|replace(".", ",") }}
+                </p>
+
+                <p class="estoque">
+                    {% if produto.estoque > 0 %}
+                    {{ produto.estoque }} unidade(s) disponível(is)
+                    {% else %}
+                    Produto esgotado
+                    {% endif %}
+                </p>
+
+                <p class="descricao-produto">
+                    Confira os detalhes e a disponibilidade deste produto
+                    no catálogo da Mini Loja.
+                </p>
+
+                <a class="botao botao-principal link-botao" href="{{ url_for('inicio') }}">
+                    Voltar ao catálogo
+                </a>
+            </div>
+
+        </article>
+
+    </main>
+
+    <footer class="rodape">
+        <p>Mini Loja · Projeto de estudo com Flask e SQLite</p>
+    </footer>
+
+</body>
+
+</html>

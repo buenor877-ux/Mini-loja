@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Página não encontrada | Mini Loja</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <main class="largura pagina-erro">
+        <div class="icone-produto" aria-hidden="true">🔎</div>
+
+        <h1>Não encontramos essa página</h1>
+
+        <p>
+            O produto pode não existir ou o endereço pode estar incorreto.
+        </p>
+
+        <a class="botao botao-principal link-botao" href="{{ url_for('inicio') }}">
+            Voltar para a loja
+        </a>
+    </main>
+
+</body>
+
+</html>
