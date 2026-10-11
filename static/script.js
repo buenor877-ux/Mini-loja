@@ -14,7 +14,6 @@ const mensagemCarrinho = document.getElementById("mensagemCarrinho");
 
 let carrinho = carregarCarrinho();
 
-
 function carregarCarrinho() {
     try {
         const dados = JSON.parse(
@@ -37,14 +36,9 @@ function carregarCarrinho() {
     }
 }
 
-
 function salvarCarrinho() {
-    localStorage.setItem(
-        CHAVE_CARRINHO,
-        JSON.stringify(carrinho)
-    );
+    localStorage.setItem(CHAVE_CARRINHO, JSON.stringify(carrinho));
 }
-
 
 function formatarMoeda(valor) {
     return valor.toLocaleString("pt-BR", {
@@ -53,13 +47,11 @@ function formatarMoeda(valor) {
     });
 }
 
-
 function mostrarMensagem(texto) {
     if (mensagemCarrinho) {
         mensagemCarrinho.textContent = texto;
     }
 }
-
 
 function adicionarProduto(botao) {
     const id = Number(botao.dataset.id);
@@ -100,7 +92,6 @@ function adicionarProduto(botao) {
     mostrarMensagem(`${nome} foi adicionado ao carrinho.`);
 }
 
-
 function alterarQuantidade(id, variacao) {
     const item = carrinho.find(produto => produto.id === id);
 
@@ -129,7 +120,6 @@ function alterarQuantidade(id, variacao) {
     mostrarMensagem("");
 }
 
-
 function removerProduto(id) {
     carrinho = carrinho.filter(item => item.id !== id);
 
@@ -137,7 +127,6 @@ function removerProduto(id) {
     renderizarCarrinho();
     mostrarMensagem("Produto removido do carrinho.");
 }
-
 
 function criarBotao(texto, classe, acao, rotulo) {
     const botao = document.createElement("button");
@@ -150,7 +139,6 @@ function criarBotao(texto, classe, acao, rotulo) {
 
     return botao;
 }
-
 
 function renderizarCarrinho() {
     if (!areaItens) {
@@ -251,13 +239,9 @@ function renderizarCarrinho() {
     }
 }
 
-
 botoesAdicionar.forEach(botao => {
-    botao.addEventListener("click", () => {
-        adicionarProduto(botao);
-    });
+    botao.addEventListener("click", () => adicionarProduto(botao));
 });
-
 
 if (botaoLimpar) {
     botaoLimpar.addEventListener("click", () => {
@@ -269,30 +253,57 @@ if (botaoLimpar) {
     });
 }
 
-
 if (botaoFinalizar) {
-    botaoFinalizar.addEventListener("click", () => {
+    botaoFinalizar.addEventListener("click", async () => {
         if (carrinho.length === 0) {
             mostrarMensagem("Adicione um produto antes de finalizar.");
             return;
         }
 
-        const resumo = carrinho
-            .map(item => `${item.quantidade}x ${item.nome}`)
-            .join("\n");
+        botaoFinalizar.disabled = true;
+        mostrarMensagem("Registrando seu pedido...");
 
-        const total = carrinho.reduce(
-            (soma, item) => soma + item.preco * item.quantidade,
-            0
-        );
+        try {
+            const resposta = await fetch("/finalizar", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    itens: carrinho.map(item => ({
+                        id: item.id,
+                        quantidade: item.quantidade
+                    }))
+                })
+            });
 
-        alert(
-            `Resumo do pedido:\n\n${resumo}\n\n` +
-            `Total: ${formatarMoeda(total)}\n\n` +
-            "Demonstração: nenhum pedido ou pagamento foi enviado."
-        );
+            const resultado = await resposta.json();
+
+            if (!resposta.ok) {
+                throw new Error(
+                    resultado.erro ||
+                    "Não foi possível registrar o pedido."
+                );
+            }
+
+            carrinho = [];
+
+            salvarCarrinho();
+            renderizarCarrinho();
+
+            mostrarMensagem(
+                `Pedido #${resultado.pedido_id} registrado com sucesso! ` +
+                `Total: ${formatarMoeda(resultado.total)}`
+            );
+
+        } catch (erro) {
+            mostrarMensagem(
+                erro.message || "Erro ao finalizar o pedido."
+            );
+        } finally {
+            botaoFinalizar.disabled = carrinho.length === 0;
+        }
     });
 }
-
 
 renderizarCarrinho();

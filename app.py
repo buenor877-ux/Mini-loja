@@ -1,5 +1,5 @@
 
-from flask import Flask, render_template, abort
+from flask import Flask, render_template, abort, request, jsonify
 import banco
 
 app = Flask(__name__)
@@ -26,6 +26,26 @@ def comprar(produto_id):
         "compra.html",
         produto=produto
     )
+
+
+@app.route("/finalizar", methods=["POST"])
+def finalizar():
+    dados = request.get_json(silent=True)
+
+    if not isinstance(dados, dict):
+        return jsonify({"erro": "Dados do pedido inválidos."}), 400
+
+    try:
+        pedido = banco.registrar_pedido(dados.get("itens"))
+
+        return jsonify({
+            "mensagem": "Pedido registrado com sucesso!",
+            "pedido_id": pedido["pedido_id"],
+            "total": pedido["total"]
+        }), 201
+
+    except ValueError as erro:
+        return jsonify({"erro": str(erro)}), 400
 
 
 @app.errorhandler(404)

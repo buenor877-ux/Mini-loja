@@ -189,7 +189,7 @@ h2 {
     text-decoration: none;
     font-weight: 750;
     cursor: pointer;
-    transition: background .15s ease, transform .15s ease;
+   transition: background .15s ease, transform .15s ease;
 }
 
 .botao:active {
